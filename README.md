@@ -7,6 +7,7 @@
 ### **Objective:** Create map based exercise logger app
 
 - Explore GeoLocation WEB API
+- Use leaflet.js library for app map
 
 &emsp;
 

@@ -21,19 +21,23 @@ if (navigator.geolocation) {
 
       const coords = [latitude, longitude];
 
+      // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
+
       const map = L.map('map').setView(coords, 13);
+      // console.log(map);
 
       L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-        .openPopup();
+      //EVENTHANDLER BUILT-IN LEAFLET
+      map.on('click', function (leafletEvent) {
+        // console.log(leafEvent);
+        const { lat, lng } = leafletEvent.latlng;
 
-      // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
+        L.marker([lat, lng]).addTo(map).bindPopup('Workout').openPopup();
+      });
     }, //SUCCESS FUNCTION
     function () {
       alert('Could not get your location');
