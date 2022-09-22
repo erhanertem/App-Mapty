@@ -6,6 +6,8 @@
 
 ### **Objective:** Create map based exercise logger app
 
+- Explore GeoLocation WEB API
+
 &emsp;
 
 #### Link to Project &rarr; [Mapty-App](https://mapty-app-erhan-ertem.netlify.app)
