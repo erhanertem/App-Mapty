@@ -36,7 +36,23 @@ if (navigator.geolocation) {
         // console.log(leafEvent);
         const { lat, lng } = leafletEvent.latlng;
 
-        L.marker([lat, lng]).addTo(map).bindPopup('Workout').openPopup();
+        L.marker([lat, lng], {
+          opacity: 0.75,
+          riseOnHover: true,
+          riseOffset: 1,
+        })
+          .addTo(map)
+          .bindPopup(
+            L.popup({
+              maxWidth: 150,
+              minWidth: 100,
+              autoClose: false,
+              closeOnClick: false,
+              className: 'running-popup',
+            })
+          )
+          .setPopupContent('Workout')
+          .openPopup();
       });
     }, //SUCCESS FUNCTION
     function () {
