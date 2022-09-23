@@ -76,16 +76,24 @@ class App {
     form.classList.remove('hidden'); //reveal the input form
     inputDistance.focus(); //by default focus on distance
   }
-  _toggleElevationField() {}
+  _toggleElevationField() {
+    ////////code
+  }
   _newWorkout(e) {
     e.preventDefault(); //to disable auto submit
-    //-->CLEAR INPUT FIELDS ON THE FORM
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
-    //-->DISPLAY THE LEAFLET MARKER
+    //-->GET DTATA FROM THE FORM
+
+    //-->CHECK IF DATAT IS VALID
+
+    //-->IF WORKOUT RUNNING, CREATE RUNNING OBJECT
+
+    //-->IF WORKOUT CYCLING, CREATE CYCLING OBJECT
+
+    //-->ADD NEW OBJECT TO WORKPOUT ARRAY
+
+    //-->RENDER WORKOUT ON LIST
+
+    //-->RENDER WORKOUT ON MAP AS MARKER
     // console.log(this.#leafletEvent);
     const { lat, lng } = this.#leafletEvent.latlng;
     L.marker([lat, lng])
@@ -101,6 +109,14 @@ class App {
       )
       .setPopupContent('Workout')
       .openPopup();
+    //-->HIDE THE FORM
+
+    //-->CLEAR INPUT FIELDS ON THE FORM
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
   }
 }
 
@@ -143,11 +159,6 @@ class Cycling extends Workout {
     return this.speed;
   }
 }
-
-//TESTING DATA CLASSES
-const run1 = new Running([39, -12], 5.2, 24, 178);
-const cycling1 = new Cycling([39, -12], 27, 95, 523);
-console.log(run1, cycling1);
 
 //APPLICATION
 //-->CREATE THE APP CLASS INSTANCE
