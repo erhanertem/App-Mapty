@@ -136,19 +136,8 @@ class App {
     //-->RENDER WORKOUT ON LIST
 
     //-->RENDER WORKOUT ON MAP AS MARKER
-    L.marker([lat, lng])
-      .addTo(this.#map)
-      .bindPopup(
-        L.popup({
-          maxWidth: 250,
-          minWidth: 100,
-          autoClose: false,
-          closeOnClick: false,
-          className: 'running-popup', //Override custom CSS provided by us on top of the leaflet.css
-        })
-      )
-      .setPopupContent('Workout')
-      .openPopup();
+    console.log(workout);
+    this.renderWorkoutMarker(workout);
     //-->HIDE THE FORM
 
     //-->CLEAR INPUT FIELDS ON THE FORM
@@ -157,6 +146,24 @@ class App {
       inputCadence.value =
       inputElevation.value =
         '';
+  }
+
+  renderWorkoutMarker(workout) {
+    // L.marker([lat, lng])
+    L.marker(workout.coords)
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: `${workout.type}-popup`, //Override custom CSS provided by us on top of the leaflet.css.
+          //NOTE: type has been lost during coding refactoring and in order to retain the type value at all times, it is incporporated into the data as a field.
+        })
+      )
+      .setPopupContent(String(workout.distance)) //temp
+      .openPopup();
   }
 }
 
@@ -176,6 +183,8 @@ class Workout {
 }
 //-->CHILD DATA CLASSES
 class Running extends Workout {
+  type = 'running';
+
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
@@ -188,6 +197,8 @@ class Running extends Workout {
   }
 }
 class Cycling extends Workout {
+  type = 'cycling';
+
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
