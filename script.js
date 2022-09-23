@@ -11,12 +11,9 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-// //GLOBAL VARIABLES
-// let map, leafletEvent;
-
-//REFACTORED CODE ROADMAP IN A CLASS
 class App {
-  #map; //INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
+  //NOTE: INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
+  #map;
   #leafletEvent;
 
   constructor() {
@@ -62,7 +59,6 @@ class App {
     // console.log(latitude, longitude);
     //-->GET GEOLOCATION FROM GEO WEB API
     const coords = [latitude, longitude];
-    // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
     //-->LEAFLET RENDER MAP PER COORDS
     this.#map = L.map('map').setView(coords, 13);
     // console.log(map);

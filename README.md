@@ -8,6 +8,7 @@
 
 - Explore GeoLocation WEB API
 - Use leaflet.js library for app map
+- Create class, in-class functions, private variables, call-back function binding
 
 &emsp;
 
