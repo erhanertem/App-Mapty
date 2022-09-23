@@ -71,17 +71,14 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
     //EVENTHANDLER BUILT-IN LEAFLET
-    this.#map.on(
-      'click',
-      function (lEvent) {
-        //-->SHOW THE FORM UPON CLICK ON THE MAP
-        this.#leafletEvent = lEvent; //Assign as class private variable
-        form.classList.remove('hidden'); //reveal the input form
-        inputDistance.focus(); //by default focus on distance
-      }.bind(this)
-    );
+    this.#map.on('click', this._showForm.bind(this));
   }
-  _showForm() {}
+  _showForm(lEvent) {
+    //-->SHOW THE FORM UPON CLICK ON THE MAP
+    this.#leafletEvent = lEvent; //Assign as class private variable
+    form.classList.remove('hidden'); //reveal the input form
+    inputDistance.focus(); //by default focus on distance
+  }
   _toggleElevationField() {}
   _newWorkout(e) {
     e.preventDefault(); //to disable auto submit
