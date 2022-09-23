@@ -11,11 +11,14 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-//GLOBAL VARIABLES
-let map, leafletEvent;
+// //GLOBAL VARIABLES
+// let map, leafletEvent;
 
 //REFACTORED CODE ROADMAP IN A CLASS
 class App {
+  #map; //INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
+  #leafletEvent;
+
   constructor() {
     //-->GET THE POSITION OF THE USER
     this._getPosition(); //NOTE: CONSTRUCTOR FUNCTION IS EXECUTED THE MOMENT AN INSTANCE OF APP IS CREATED. SO INSTEAD OF DECLARING THIS OUTSIDE AS <this._getPosition();>, WE CAN INLCUDE THIS INSIDE THE CONSTRUCTOR TO EXECUTE IMMEDIATELY.
@@ -24,7 +27,7 @@ class App {
   _getPosition() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        this._loadMap, //VERY IMPORTANT! we do not invoke it just pass the function name so that we dont use  _loadMap(position)
+        this._loadMap.bind(this), //VERY IMPORTANT! we do not invoke it just pass the function name so that we dont use  _loadMap(position) ---- <bind(this)> is used beacuse a call-back function has its no this defined by its nature. In order to assign this , we need to bind it.
         //-->GEO API ERROR CALL-BACK FUNCTION
         function () {
           alert('Could not get your location');
@@ -48,16 +51,16 @@ class App {
     const coords = [latitude, longitude];
     // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
     //-->LEAFLET RENDER MAP PER COORDS
-    map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, 13);
     // console.log(map);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    }).addTo(this.#map);
     //EVENTHANDLER BUILT-IN LEAFLET
-    map.on('click', function (lEvent) {
+    this.#map.on('click', function (lEvent) {
       //-->SHOW THE FORM UPON CLICK ON THE MAP
-      leafletEvent = lEvent; //Assign as global variable
+      this.#leafletEvent = lEvent; //Assign as global variable
       form.classList.remove('hidden'); //reveal the input form
       inputDistance.focus(); //by default focus on distance
     });
