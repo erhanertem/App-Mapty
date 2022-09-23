@@ -16,53 +16,60 @@ let map, leafletEvent;
 
 //REFACTORED CODE ROADMAP IN A CLASS
 class App {
-  constructor() {}
+  constructor() {
+    //-->GET THE POSITION OF THE USER
+    this._getPosition(); //NOTE: CONSTRUCTOR FUNCTION IS EXECUTED THE MOMENT AN INSTANCE OF APP IS CREATED. SO INSTEAD OF DECLARING THIS OUTSIDE AS <this._getPosition();>, WE CAN INLCUDE THIS INSIDE THE CONSTRUCTOR TO EXECUTE IMMEDIATELY.
+  }
 
-  _getPosition() {}
-  _loadMap() {}
+  _getPosition() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        this._loadMap, //VERY IMPORTANT! we do not invoke it just pass the function name so that we dont use  _loadMap(position)
+        //-->GEO API ERROR CALL-BACK FUNCTION
+        function () {
+          alert('Could not get your location');
+        },
+        //-->GEO API OPTIONS
+        {
+          enableHighAccuracy: true, //WHEN POSSIBLE GET THE BEST RESULT
+          timeout: 5000, //WAIT FOR XXX mls TO RETURN LOCATION @MAX
+          maximumAge: 0, //RETURN REAL POSITION NOT CACHED POSITION
+        }
+      );
+    }
+  }
+  _loadMap(position) {
+    //-->GEO API SUCCESS CALL-BACK FUNCTION
+    // console.log(position);
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    // console.log(latitude, longitude);
+    //-->GET GEOLOCATION FROM GEO WEB API
+    const coords = [latitude, longitude];
+    // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
+    //-->LEAFLET RENDER MAP PER COORDS
+    map = L.map('map').setView(coords, 13);
+    // console.log(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    //EVENTHANDLER BUILT-IN LEAFLET
+    map.on('click', function (lEvent) {
+      //-->SHOW THE FORM UPON CLICK ON THE MAP
+      leafletEvent = lEvent; //Assign as global variable
+      form.classList.remove('hidden'); //reveal the input form
+      inputDistance.focus(); //by default focus on distance
+    });
+  }
   _showForm() {}
   _toggleElevationField() {}
   _newWorkout() {}
 }
 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    //-->GEO API SUCCESS CALL-BACK FUNCTION
-    function (position) {
-      // console.log(position);
-      const { latitude } = position.coords;
-      const { longitude } = position.coords;
-      // console.log(latitude, longitude);
-      //-->GET GEOLOCATION FROM GEO WEB API
-      const coords = [latitude, longitude];
-      // console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`);
-      //-->LEAFLET RENDER MAP PER COORDS
-      map = L.map('map').setView(coords, 13);
-      // console.log(map);
-      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
-      //EVENTHANDLER BUILT-IN LEAFLET
-      map.on('click', function (lEvent) {
-        //-->SHOW THE FORM UPON CLICK ON THE MAP
-        leafletEvent = lEvent; //Assign as global variable
-        form.classList.remove('hidden'); //reveal the input form
-        inputDistance.focus(); //by default focus on distance
-      });
-    },
-    //-->GEO API ERROR CALL-BACK FUNCTION
-    function () {
-      alert('Could not get your location');
-    },
-    //-->GEO API OPTIONS
-    {
-      enableHighAccuracy: true, //WHEN POSSIBLE GET THE BEST RESULT
-      timeout: 5000, //WAIT FOR XXX mls TO RETURN LOCATION @MAX
-      maximumAge: 0, //RETURN REAL POSITION NOT CACHED POSITION
-    }
-  );
-}
+//-->CREATE THE OBJECT
+const app = new App();
+
 //EVENTHANDLER WORKOUT SUBMIT FORM
 form.addEventListener('submit', function (e) {
   e.preventDefault(); //to disable auto submit
