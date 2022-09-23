@@ -80,15 +80,42 @@ class App {
     ////////code
   }
   _newWorkout(e) {
+    //-->PREVENT DEFAULT AUTO SUBMIT BEHAVIOUR
     e.preventDefault(); //to disable auto submit
-    //-->GET DTATA FROM THE FORM
 
-    //-->CHECK IF DATAT IS VALID
+    //HELPERFUNCTION FOR VALIDITY CHECK OF ALL ITEMS
+    const validInputs = (...inputs) =>
+      inputs.every(input => Number.isFinite(input));
+    //HELPERFUNCTION FOR VALIDITY CHECK OF ALL ITEMS
+    const allPositive = (...inputs) => inputs.every(input => input > 0);
+
+    //-->GET DATA FROM THE FORM
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
 
     //-->IF WORKOUT RUNNING, CREATE RUNNING OBJECT
-
+    if (type === 'running') {
+      const cadence = +inputCadence.value;
+      //-->CHECK IF DATAT IS VALID - guard clause
+      if (
+        // !Number.isFinite(distance) ||
+        // !Number.isFinite(duration) ||
+        // !Number.isFinite(cadence)
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
+      )
+        return alert('Inputs have to be positive numbers!');
+    }
     //-->IF WORKOUT CYCLING, CREATE CYCLING OBJECT
-
+    if (type === 'cycling') {
+      const elevation = +inputElevation.value;
+      if (
+        !validInputs(distance, duration, elevation) ||
+        !allPositive(distance, duration)
+      )
+        return alert('Inputs have to be positive numbers!');
+    }
     //-->ADD NEW OBJECT TO WORKPOUT ARRAY
 
     //-->RENDER WORKOUT ON LIST
