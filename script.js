@@ -14,6 +14,17 @@ const inputElevation = document.querySelector('.form__input--elevation');
 //GLOBAL VARIABLES
 let map, leafletEvent;
 
+//REFACTORED CODE ROADMAP IN A CLASS
+class App {
+  constructor() {}
+
+  _getPosition() {}
+  _loadMap() {}
+  _showForm() {}
+  _toggleElevationField() {}
+  _newWorkout() {}
+}
+
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
     //-->GEO API SUCCESS CALL-BACK FUNCTION
