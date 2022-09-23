@@ -16,6 +16,7 @@ class App {
   //NOTE: INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
   #map;
   #leafletEvent;
+  #workouts = []; //data arr for saving workouts to
 
   constructor() {
     //-->GET THE POSITION OF THE USER
@@ -93,10 +94,14 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
+    // console.log(this.#leafletEvent);
+    const { lat, lng } = this.#leafletEvent.latlng;
+    let workout;
 
     //-->IF WORKOUT RUNNING, CREATE RUNNING OBJECT
     if (type === 'running') {
       const cadence = +inputCadence.value;
+
       //-->CHECK IF DATAT IS VALID - guard clause
       if (
         // !Number.isFinite(distance) ||
@@ -106,23 +111,31 @@ class App {
         !allPositive(distance, duration, cadence)
       )
         return alert('Inputs have to be positive numbers!');
+
+      //-->SAVE THE RUNNING OBJECT TO WORKOUT DATA ARRAY
+      workout = new Running([lat, lng], duration, cadence); //required inputs coords,duration,cadence
+      this.#workouts.push(workout);
     }
     //-->IF WORKOUT CYCLING, CREATE CYCLING OBJECT
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
+
+      //-->CHECK IF DATAT IS VALID - guard clause
       if (
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
       )
         return alert('Inputs have to be positive numbers!');
+
+      //-->SAVE THE RUNNING OBJECT TO WORKOUT DATA ARRAY
+      workout = new Cycling([lat, lng], duration, elevation); //required inputs coords,duration,cadence
+      this.#workouts.push(workout);
     }
     //-->ADD NEW OBJECT TO WORKPOUT ARRAY
 
     //-->RENDER WORKOUT ON LIST
 
     //-->RENDER WORKOUT ON MAP AS MARKER
-    // console.log(this.#leafletEvent);
-    const { lat, lng } = this.#leafletEvent.latlng;
     L.marker([lat, lng])
       .addTo(this.#map)
       .bindPopup(
