@@ -1,8 +1,5 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
@@ -10,13 +7,69 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+///////////////////////////////////
+//CREATE CLASSES FOR THE MAPTY DATA
+//--> PARENT DATA CLASS
+class Workout {
+  date = new Date();
+  id = String(Date.now()).slice(-10); // id = (Date.now() + '').slice(-10)
 
+  constructor(coords, distance, duration) {
+    // this.date =...
+    // this.id = ...
+    this.coords = coords; // [lat, lng]
+    this.distance = distance; //in km
+    this.duration = duration; //in min
+  }
+
+  _setDescription() {
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`;
+  }
+}
+
+//-->CHILD DATA CLASSES
+class Running extends Workout {
+  type = 'running';
+
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    this.calcPace(); //NOTE: INSERT INTO CONSTRUCTOR FUNCTION TO IMMEDIATELY CALC THE PACE
+    this._setDescription(); //NOTE: WE PLACED HERE AS WE REQUIRE TYPE VARIABLE DEFINED AND PARENT CONSTRUCTOR() IS NOT THE PALCE ITS DEFINED BUT HERE.
+  }
+
+  calcPace() {
+    this.pace = this.duration / this.distance; //min/km
+    return this.pace;
+  }
+}
+class Cycling extends Workout {
+  type = 'cycling';
+
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed(); //NOTE: INSERT INTO CONSTRUCTOR FUNCTION TO IMMEDIATELY CALC THE SPEED
+    this._setDescription(); //NOTE: WE PLACED HERE AS WE REQUIRE TYPE VARIABLE DEFINED AND PARENT CONSTRUCTOR() IS NOT THE PALCE ITS DEFINED BUT HERE.
+  }
+
+  calcSpeed() {
+    this.speed = this.distance / (this.duration / 60); //km/hr
+    return this.speed;
+  }
+}
+///////////////////////////////////
 //APPLICATION ARCHITECTURE
 class App {
   //NOTE: INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
   #map;
   #leafletEvent;
-  #workouts = []; //data arr for saving workouts to
+  #workouts = []; //data arr for saving workouts to - privatized via #
 
   constructor() {
     //-->GET THE POSITION OF THE USER
@@ -39,7 +92,8 @@ class App {
   _getPosition() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        this._loadMap.bind(this), //VERY IMPORTANT! we do not invoke it just pass the function name so that we dont use  _loadMap(position) ---- <bind(this)> is used because a call-back function has its no this defined by its nature. In order to assign this , we need to bind it.
+        this._loadMap.bind(this),
+        //VERY IMPORTANT! we do not invoke it just pass the function name so that we dont use  _loadMap(position) ---- <bind(this)> is used because a call-back function has its no this defined by its nature. In order to assign this , we need to bind it.
         //-->GEO API ERROR CALL-BACK FUNCTION
         function () {
           alert('Could not get your location');
@@ -53,6 +107,7 @@ class App {
       );
     }
   }
+
   _loadMap(position) {
     //-->GEO API SUCCESS CALL-BACK FUNCTION
     // console.log(position, this);
@@ -71,38 +126,53 @@ class App {
     //EVENTHANDLER BUILT-IN LEAFLET
     this.#map.on('click', this._showForm.bind(this));
   }
+
   _showForm(lEvent) {
     //-->SHOW THE FORM UPON CLICK ON THE MAP
     this.#leafletEvent = lEvent; //Assign as class private variable
-    form.classList.remove('hidden'); //reveal the input form
+    form.classList.toggle('hidden');
+    form.classList.toggle('form--transition');
     inputDistance.focus(); //by default focus on distance
   }
+
+  _hideForm() {
+    //-->CLEAR INPUT FIELDS ON THE FORM
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+    form.classList.toggle('hidden');
+    form.classList.toggle('form--transition');
+  }
+
   _toggleElevationField() {
     ////////code
   }
+
   _newWorkout(e) {
     //-->PREVENT DEFAULT AUTO SUBMIT BEHAVIOUR
     e.preventDefault(); //to disable auto submit
-
+    ////////////////////////////////////////////////
     //HELPERFUNCTION FOR VALIDITY CHECK OF ALL ITEMS
     const validInputs = (...inputs) =>
       inputs.every(input => Number.isFinite(input));
     //HELPERFUNCTION FOR VALIDITY CHECK OF ALL ITEMS
     const allPositive = (...inputs) => inputs.every(input => input > 0);
-
+    ///////////////////////////////////////////////
     //-->GET DATA FROM THE FORM
     const type = inputType.value;
     const distance = +inputDistance.value;
+    //NOTE: input elements always returns strings so we need to convert them to numbers immediately
     const duration = +inputDuration.value;
     // console.log(this.#leafletEvent);
     const { lat, lng } = this.#leafletEvent.latlng;
-    let workout;
+    let workout; //we define it here so both if caluses can reach this variable
 
-    //-->IF WORKOUT RUNNING, CREATE RUNNING OBJECT
+    //-->IF WORKOUT IS RUNNING, CREATE RUNNING OBJECT
     if (type === 'running') {
       const cadence = +inputCadence.value;
-
-      //-->CHECK IF DATAT IS VALID - guard clause
+      //-->CHECK IF DATA IS VALID - guard clause
       if (
         // !Number.isFinite(distance) ||
         // !Number.isFinite(duration) ||
@@ -111,44 +181,35 @@ class App {
         !allPositive(distance, duration, cadence)
       )
         return alert('Inputs have to be positive numbers!');
-
       //-->SAVE THE RUNNING OBJECT TO WORKOUT DATA ARRAY
-      workout = new Running([lat, lng], duration, cadence); //required inputs coords,duration,cadence
-      this.#workouts.push(workout);
+      workout = new Running([lat, lng], distance, duration, cadence); //required inputs coords,duration,cadence
     }
-    //-->IF WORKOUT CYCLING, CREATE CYCLING OBJECT
+    //-->IF WORKOUT IS CYCLING, CREATE CYCLING OBJECT
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
-
       //-->CHECK IF DATAT IS VALID - guard clause
       if (
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
       )
         return alert('Inputs have to be positive numbers!');
-
       //-->SAVE THE RUNNING OBJECT TO WORKOUT DATA ARRAY
-      workout = new Cycling([lat, lng], duration, elevation); //required inputs coords,duration,cadence
-      this.#workouts.push(workout);
+      workout = new Cycling([lat, lng], distance, duration, elevation); //required inputs coords,duration,cadence
     }
-    //-->ADD NEW OBJECT TO WORKPOUT ARRAY
 
-    //-->RENDER WORKOUT ON LIST
-
-    //-->RENDER WORKOUT ON MAP AS MARKER
+    //-->ADD NEW OBJECT TO WORKOUT ARRAY
+    this.#workouts.push(workout);
     console.log(workout);
-    this.renderWorkoutMarker(workout);
+    //-->RENDER WORKOUT ON LIST
+    this._renderWorkout(workout);
+    //-->RENDER WORKOUT ON MAP AS MARKER
+    // console.log(workout);
+    this._renderWorkoutMarker(workout);
     //-->HIDE THE FORM
-
-    //-->CLEAR INPUT FIELDS ON THE FORM
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    this._hideForm();
   }
 
-  renderWorkoutMarker(workout) {
+  _renderWorkoutMarker(workout) {
     // L.marker([lat, lng])
     L.marker(workout.coords)
       .addTo(this.#map)
@@ -162,52 +223,59 @@ class App {
           //NOTE: type has been lost during coding refactoring and in order to retain the type value at all times, it is incporporated into the data as a field.
         })
       )
-      .setPopupContent(String(workout.distance)) //temp
+      .setPopupContent(
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
+      )
       .openPopup();
   }
-}
 
-//CREATE CLASSES FOR THE MAPTY DATA
-//--> PARENT DATA CLASS
-class Workout {
-  date = new Date();
-  id = String(Date.now()).slice(-10); // id = (new Date() + '').slice(-10)
+  _renderWorkout(workout) {
+    let html = ` 
+        <li class="workout workout--${workout.type}" data-id="${workout.id}">
+          <h2 class="workout__title">${workout.description}</h2>
+          <div class="workout__details">
+            <span class="workout__icon">${
+              workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
+            }</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span>
+            <span class="workout__unit">min</span>
+          </div>
+        `;
 
-  constructor(coords, distance, duration) {
-    // this.date =...
-    // this.id = ...
-    this.coords = coords; // [lat, lng]
-    this.distance = distance; //in km
-    this.duration = duration; //in min
-  }
-}
-//-->CHILD DATA CLASSES
-class Running extends Workout {
-  type = 'running';
-
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
-    this.cadence = cadence;
-    this.calcPace(); //NOTE: INSERT INTO CONSTRUCTOR FUNCTION TO IMMEDIATELY CALC THE PACE
-  }
-
-  calcPace() {
-    this.pace = this.duration / this.distance; //min/km
-    return this.pace;
-  }
-}
-class Cycling extends Workout {
-  type = 'cycling';
-
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
-    this.elevationGain = elevationGain;
-    this.calcSpeed(); //NOTE: INSERT INTO CONSTRUCTOR FUNCTION TO IMMEDIATELY CALC THE SPEED
-  }
-
-  calcSpeed() {
-    this.speed = this.distance / (this.duration / 60); //km/hr
-    return this.speed;
+    if (workout.type === 'running')
+      html += `
+          <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.pace.toFixed(1)}</span>
+            <span class="workout__unit">min/km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">🦶🏼</span>
+            <span class="workout__value">${workout.cadence}</span>
+            <span class="workout__unit">spm</span>
+          </div>
+        </li>
+      `;
+    if (workout.type === 'cycling')
+      html += `
+          <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.speed.toFixed(1)}</span>
+            <span class="workout__unit">km/h</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⛰</span>
+            <span class="workout__value">${workout.elevationGain}</span>
+            <span class="workout__unit">m</span>
+          </div>
+        </li> 
+      `;
+    form.insertAdjacentHTML('afterend', html);
   }
 }
 
