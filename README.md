@@ -11,6 +11,20 @@
 - Create class, class functions, private variables, call-back function binding inside classes
 - Explore localStorage WEB API
 
+  &emsp;
+  **<p style="color:red">TODOs:</p>**
+
+- Ability to edit a workout
+- Ability to delete a workout
+- Ability to delete all workouts
+- Ability to sort workouts by certain parameter
+- Re-build running and cycling objects coming from local storage
+- Realistic error and confirmation popups
+- Ability to position the map to show all workouts
+- Ability to draw lines and shapes instead of pin points
+- Geocode location from coords
+- Display weather data for workout time and place
+
 &emsp;
 
 #### Link to Project &rarr; [Mapty-App](https://mapty-app-erhan-ertem.netlify.app)
