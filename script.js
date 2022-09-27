@@ -78,16 +78,15 @@ class App {
   #mapZoomLevel = 13; //set leaflet map zoom level
 
   constructor() {
-    //-->GET THE POSITION OF THE USER
+    //-->GET THE USER POSITION
     //NOTE: CONSTRUCTOR FUNCTION IS EXECUTED THE MOMENT AN INSTANCE OF APP IS CREATED. SO INSTEAD OF DECLARING THIS OUTSIDE AS <this._getPosition();>, WE CAN INLCUDE THIS INSIDE THE CONSTRUCTOR TO EXECUTE IMMEDIATELY.
     this._getPosition();
+    //-->GET THE LOCALSTORAGE DATA
+    this._getLocalStorage();
     //EVENTHANDLER WORKOUT TYPE CHANGE
     //NOTE: EVENTLISTENERS NEEDS TO BE RUN IMMEDIATELY WHEN THEPAGE/APP LOADS SO THATS WHY WE INCLUDE IN THE CONSTRUCTOR FUNCTION OF THE CLASS
     inputType.addEventListener('change', function () {
-      inputElevation
-        .closest('.form__row')
-        .classList.toggle('form__row--hidden');
-      inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+      this._toggleElevationField;
     });
     //EVENTHANDLER WORKOUT SUBMIT FORM
     form.addEventListener('submit', this._newWorkout.bind(this));
@@ -131,6 +130,10 @@ class App {
     }).addTo(this.#map);
     //EVENTHANDLER BUILT-IN LEAFLET
     this.#map.on('click', this._showForm.bind(this));
+
+    //-->RENDER WORKOUT ARRAY FROM THE LOCAL STORAGE
+    //renderWorkoutMarker() DEPENDENCIES HAVE BEEN ALREADY AVAILABLE BY THIS TIME
+    this.#workouts.forEach(item => this._renderWorkoutMarker(item));
   }
 
   _showForm(lEvent) {
@@ -153,8 +156,10 @@ class App {
     form.classList.toggle('form--transition');
   }
 
+  //-->TOGGLE ELEVATION FIELDS
   _toggleElevationField() {
-    ////////code
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
   _newWorkout(e) {
@@ -206,7 +211,7 @@ class App {
 
     //-->ADD NEW OBJECT TO WORKOUT ARRAY
     this.#workouts.push(workout);
-    console.log(workout);
+    // console.log(workout);
     //-->RENDER WORKOUT ON MAP AS MARKER
     // console.log(workout);
     this._renderWorkoutMarker(workout);
@@ -308,6 +313,24 @@ class App {
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts)); //localstorage(name of the storage, convert JS object(in this case our private array of workouts) to a keep JSON string)
   }
+
+  _getLocalStorage() {
+    //-->RETRIEVE DATA FROM THE LOCALSTROAGE AND DE-JSON IT
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    // console.log(data); //NOTE: localstroage.getitem() retrieves the JSON type localdata - we got to deJSON it via JSON.parse()!!!
+
+    if (!data) return; //GUARD CLAUSE CHECKING IF THERE IS ANY DATA IN THE LOCALSTORAGE ELSE DO NOTHING AND RETURN
+    //-->REASSIGN LOCALDATA TO WORKOUT ARRAY
+    this.#workouts = data; //reassing localstorgae data to actual workouts array. Since getlocalstorage() is executed as part of the constrcutor function of the app object, workout array gets refreshed.
+    //-->RENDER WORKOUT LIST PER THE IMPORTED LOCALSTORAGE
+    this.#workouts.forEach(item => this._renderWorkout(item));
+    // this.#workouts.forEach(item => this._renderWorkoutMarker(item)); //async js issues here - many dependency is not loaded yet thereby throwing error
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
+  } //NOTE: WE IMPLEMENTED ONLY IN THE CODE, ONCE CALLED AS app.reset(), it deletes all the data in the localstorage
 }
 
 //APPLICATION
