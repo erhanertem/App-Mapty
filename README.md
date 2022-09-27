@@ -14,16 +14,8 @@
   &emsp;
   **<p style="color:red">TODOs:</p>**
 
-- Ability to edit a workout
-- Ability to delete a workout
-- Ability to delete all workouts
-- Ability to sort workouts by certain parameter
-- Re-build running and cycling objects coming from local storage
-- Realistic error and confirmation popups
-- Ability to position the map to show all workouts
-- Ability to draw lines and shapes instead of pin points
-- Geocode location from coords
-- Display weather data for workout time and place
+    <p style="color:red">- Ability to edit a workout</br>- Ability to delete a workout</br>- Ability to delete all workouts</br>- Ability to sort workouts by certain parameter</br>- Re-build running and cycling objects coming from local storage</br>- Realistic error and confirmation popups</br>- Ability to position the map to show all workouts</br>- Ability to draw lines and shapes instead of pin points</br>- Geocode location from coords</br>- Display weather data for workout time and place
+  </p>
 
 &emsp;
 
