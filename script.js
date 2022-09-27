@@ -1,18 +1,11 @@
 'use strict';
-
-const form = document.querySelector('.form');
-const containerWorkouts = document.querySelector('.workouts');
-const inputType = document.querySelector('.form__input--type');
-const inputDistance = document.querySelector('.form__input--distance');
-const inputDuration = document.querySelector('.form__input--duration');
-const inputCadence = document.querySelector('.form__input--cadence');
-const inputElevation = document.querySelector('.form__input--elevation');
 ///////////////////////////////////
 //CREATE CLASSES FOR THE MAPTY DATA
 //--> PARENT DATA CLASS
 class Workout {
   date = new Date();
   id = String(Date.now()).slice(-10); // id = (Date.now() + '').slice(-10)
+  // clicks = 0;
 
   constructor(coords, distance, duration) {
     // this.date =...
@@ -30,6 +23,10 @@ class Workout {
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
   }
+
+  // click() {
+  //   this.clicks++;
+  // }
 }
 
 //-->CHILD DATA CLASSES
@@ -64,18 +61,26 @@ class Cycling extends Workout {
   }
 }
 ///////////////////////////////////
+const form = document.querySelector('.form');
+const containerWorkouts = document.querySelector('.workouts');
+const inputType = document.querySelector('.form__input--type');
+const inputDistance = document.querySelector('.form__input--distance');
+const inputDuration = document.querySelector('.form__input--duration');
+const inputCadence = document.querySelector('.form__input--cadence');
+const inputElevation = document.querySelector('.form__input--elevation');
+///////////////////////////////////
 //APPLICATION ARCHITECTURE
 class App {
   //NOTE: INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
   #map;
   #leafletEvent;
   #workouts = []; //data arr for saving workouts to - privatized via #
+  #mapZoomLevel = 13;
 
   constructor() {
     //-->GET THE POSITION OF THE USER
     //NOTE: CONSTRUCTOR FUNCTION IS EXECUTED THE MOMENT AN INSTANCE OF APP IS CREATED. SO INSTEAD OF DECLARING THIS OUTSIDE AS <this._getPosition();>, WE CAN INLCUDE THIS INSIDE THE CONSTRUCTOR TO EXECUTE IMMEDIATELY.
     this._getPosition();
-
     //EVENTHANDLER WORKOUT TYPE CHANGE
     //NOTE: EVENTLISTENERS NEEDS TO BE RUN IMMEDIATELY WHEN THEPAGE/APP LOADS SO THATS WHY WE INCLUDE IN THE CONSTRUCTOR FUNCTION OF THE CLASS
     inputType.addEventListener('change', function () {
@@ -84,9 +89,10 @@ class App {
         .classList.toggle('form__row--hidden');
       inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
     });
-
     //EVENTHANDLER WORKOUT SUBMIT FORM
     form.addEventListener('submit', this._newWorkout.bind(this));
+    //EVENTHANDLER WORKOUT FOCUS ON CLICK
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this)); //NOTE: we call _moveToPopup as a call back function in our event listener in which we utilize this. this for callback is limited to containerWorkouts not the app object itself. So we need to use bind(this) to link to App object this
   }
 
   _getPosition() {
@@ -117,7 +123,7 @@ class App {
     //-->GET GEOLOCATION FROM GEO WEB API
     const coords = [latitude, longitude];
     //-->LEAFLET RENDER MAP PER COORDS
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
     // console.log(map);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -130,6 +136,7 @@ class App {
   _showForm(lEvent) {
     //-->SHOW THE FORM UPON CLICK ON THE MAP
     this.#leafletEvent = lEvent; //Assign as class private variable
+    // console.log(this.#leafletEvent);
     form.classList.toggle('hidden');
     form.classList.toggle('form--transition');
     inputDistance.focus(); //by default focus on distance
@@ -276,6 +283,23 @@ class App {
         </li> 
       `;
     form.insertAdjacentHTML('afterend', html);
+  }
+  _moveToPopup(event) {
+    const workoutEl = event.target.closest('.workout'); //find the closest li element whenever the item is clicked
+    console.log(workoutEl);
+    if (!workoutEl) return; //GUARD CLAUSE
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id //workoutEl <li> element has data-id!
+    );
+    console.log(workout);
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: { duration: 1 },
+    }); //setView() leaflet library function(coords, zoomlevel, options)
+
+    // workout.click();
   }
 }
 

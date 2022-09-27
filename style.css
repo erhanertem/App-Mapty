@@ -129,7 +129,7 @@ a:visited {
 
 .form--transition {
   transition: all 0.5s, transform 1ms;
-}
+} /* WE ADDED THIS TO TOGGLE IN ISOLATION BETWEEN SHOWFORM AND HIDEFORM EVENTS */
 
 .form.hidden {
   transform: translateY(-30rem);
