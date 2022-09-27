@@ -72,10 +72,10 @@ const inputElevation = document.querySelector('.form__input--elevation');
 //APPLICATION ARCHITECTURE
 class App {
   //NOTE: INCORPORATE THE GLOBAL VARIABLES RELATED TO CLASS FUNCTIONS INTO THE CLASS
-  #map;
+  #map; //records of workouts kept in this array
   #leafletEvent;
   #workouts = []; //data arr for saving workouts to - privatized via #
-  #mapZoomLevel = 13;
+  #mapZoomLevel = 13; //set leaflet map zoom level
 
   constructor() {
     //-->GET THE POSITION OF THE USER
@@ -207,13 +207,15 @@ class App {
     //-->ADD NEW OBJECT TO WORKOUT ARRAY
     this.#workouts.push(workout);
     console.log(workout);
-    //-->RENDER WORKOUT ON LIST
-    this._renderWorkout(workout);
     //-->RENDER WORKOUT ON MAP AS MARKER
     // console.log(workout);
     this._renderWorkoutMarker(workout);
-    //-->HIDE THE FORM
+    //-->RENDER WORKOUT ON LIST
+    this._renderWorkout(workout);
+    //-->HIDE THE FORM + CLEAR INPUT FIELDS
     this._hideForm();
+    //-->SET LOCAL STORAGE TO ALL WORKOUTS
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -284,15 +286,16 @@ class App {
       `;
     form.insertAdjacentHTML('afterend', html);
   }
+
   _moveToPopup(event) {
     const workoutEl = event.target.closest('.workout'); //find the closest li element whenever the item is clicked
-    console.log(workoutEl);
+    // console.log(workoutEl);
     if (!workoutEl) return; //GUARD CLAUSE
 
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id //workoutEl <li> element has data-id!
     );
-    console.log(workout);
+    // console.log(workout);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
@@ -300,6 +303,10 @@ class App {
     }); //setView() leaflet library function(coords, zoomlevel, options)
 
     // workout.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts)); //localstorage(name of the storage, convert JS object(in this case our private array of workouts) to a keep JSON string)
   }
 }
 
