@@ -11,29 +11,12 @@
 - Create class, class functions, private variables, call-back function binding inside classes
 - Explore localStorage WEB API
 
-  &emsp;
-  **<p style="color:red">TODOs:</p>**
-
-    <p style="color:red">- Ability to edit a workout</br>- Ability to delete a workout</br>- Ability to delete all workouts</br>- Ability to sort workouts by certain parameter</br>- Re-build running and cycling objects coming from local storage</br>- Realistic error and confirmation popups</br>- Ability to position the map to show all workouts</br>- Ability to draw lines and shapes instead of pin points</br>- Geocode location from coords</br>- Display weather data for workout time and place
-  </p>
-
 &emsp;
 
-#### Link to Project &rarr; [Mapty-App](https://mapty-app-erhan-ertem.netlify.app)
+#### [Mapty-App](https://mapty-app-erhan-ertem.netlify.app)
 
-![Screenshot](screenshot.gif)
+<img src="./screenshot.webp" width="500px"/>
 
 ---
 
-![JS](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-
-<details>
-<summary>Installed NPM packages and utilized APIs:</summary>
-
-| Package command     | Package link                          | Description                                                         |
-| ------------------- | ------------------------------------- | ------------------------------------------------------------------- |
-| npm install leaflet | https://www.npmjs.com/package/leaflet | Open-source JavaScript library for mobile-friendly interactive maps |
-
-</details>
-
-&emsp;
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=square&logo=css3&logoColor=white) ![JS](https://img.shields.io/badge/JavaScript-323330?style=square&logo=javascript&logoColor=F7DF1E)
